@@ -2,7 +2,7 @@
 
 Thanks for taking the time to contribute! 🌱 Barely is a small, opinionated project, and clear, well-scoped contributions are the easiest to merge. This guide explains how to propose changes.
 
-The `main` branch is **protected** — nobody pushes to it directly (including the maintainer). Every change lands through a **pull request**, and most PRs should start from an **issue**.
+The `main` branch is **protected** - nobody pushes to it directly (including the maintainer). Every change lands through a **pull request**, and most PRs should start from an **issue**.
 
 ## Table of contents
 
@@ -21,10 +21,10 @@ Be kind. It's on brand. Assume good intent, keep discussion focused on the work,
 
 ## Ways to contribute
 
-- 🐞 **Report a bug** — [open a bug report](https://github.com/Akshay2996/barely/issues/new/choose).
-- 💡 **Suggest a feature** — [open a feature request](https://github.com/Akshay2996/barely/issues/new/choose). Barely deliberately does _less_, so please explain why it fits the philosophy.
-- 📖 **Improve docs** — typos, clarifications, and examples are all welcome.
-- 🧑‍💻 **Write code** — fix a bug or implement an accepted feature.
+- 🐞 **Report a bug** - [open a bug report](https://github.com/Akshay2996/barely/issues/new/choose).
+- 💡 **Suggest a feature** - [open a feature request](https://github.com/Akshay2996/barely/issues/new/choose). Barely deliberately does _less_, so please explain why it fits the philosophy.
+- 📖 **Improve docs** - typos, clarifications, and examples are all welcome.
+- 🧑‍💻 **Write code** - fix a bug or implement an accepted feature.
 
 ## Start with an issue
 
@@ -66,20 +66,20 @@ Because `main` is protected, use a fork-and-branch flow:
    git checkout -b fix/progress-calendar-timezone
    ```
    Use a prefix that matches the change: `feat/`, `fix/`, `docs/`, `refactor/`, `chore/`.
-3. Make your change. Keep it focused — one logical change per PR.
+3. Make your change. Keep it focused - one logical change per PR.
 4. Run `npm run typecheck`, `npm run build`, and `npm run format`.
 5. Commit (see [commit messages](#commit-messages)) and push to your fork.
 6. Open a **pull request against `Akshay2996/barely:main`**. Fill out the PR template and **link the issue** it resolves (e.g. `Closes #123`).
 7. A maintainer reviews it. Address feedback by pushing more commits to the same branch. Once approved, the maintainer merges it.
 
-> Direct pushes to `main` are rejected by branch protection — always go through a PR.
+> Direct pushes to `main` are rejected by branch protection - always go through a PR.
 
 ## Coding standards
 
 - **TypeScript** everywhere; no `any` unless genuinely unavoidable, and keep types close to the data.
-- **Prettier** is the source of truth for formatting — run `npm run format`. The config lives in `.prettierrc`.
+- **Prettier** is the source of truth for formatting - run `npm run format`. The config lives in `.prettierrc`.
 - **Match the surrounding code.** Follow the existing patterns for stores (Zustand), the repository/storage layer, and the CSS design tokens in `src/index.css`.
-- **Use plain hyphens** (`-`) in user-facing copy and comments, not em/en dashes — the project keeps this consistent.
+- **Use plain hyphens** (`-`) in user-facing copy and comments, not em/en dashes - the project keeps this consistent.
 - **Keep it accessible:** interactive elements need keyboard support and sensible `aria-*` labels.
 - **Keep it responsive:** verify changes at mobile, tablet, and desktop widths, and respect safe-area insets.
 - **Stay on philosophy:** features should help people do _less_, kindly. If it adds pressure or clutter, it probably doesn't belong.
@@ -102,4 +102,4 @@ docs: clarify PWA install steps
 - It includes before/after screenshots for UI changes.
 - It updates docs when behavior changes.
 
-Thanks again — every tiny contribution counts. 🌱
+Thanks again - every tiny contribution counts. 🌱

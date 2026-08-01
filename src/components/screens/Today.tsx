@@ -65,7 +65,12 @@ function TaskRow({ task }: { task: Task }) {
         >
           <Icon name="check" size={16} strokeWidth={3} />
         </button>
-        <button className="btn btn-icon" onClick={cancel} aria-label="Cancel" style={{ flex: "none" }}>
+        <button
+          className="btn btn-icon"
+          onClick={cancel}
+          aria-label="Cancel"
+          style={{ flex: "none" }}
+        >
           <Icon name="x" size={16} />
         </button>
       </div>

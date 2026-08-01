@@ -41,9 +41,9 @@ function createIdbBackend(db: IDBPDatabase<BarelySchema>): Backend {
       return (await db.getAllFromIndex("tasks", "by-date", date)).sort(byCreated);
     },
     async getInRange(start, end) {
-      return (
-        await db.getAllFromIndex("tasks", "by-date", IDBKeyRange.bound(start, end))
-      ).sort(byCreated);
+      return (await db.getAllFromIndex("tasks", "by-date", IDBKeyRange.bound(start, end))).sort(
+        byCreated,
+      );
     },
     async save(task) {
       await db.put("tasks", task);
@@ -79,9 +79,7 @@ function createMemoryBackend(): Backend {
       return [...tasks.values()].filter((t) => t.date === date).sort(byCreated);
     },
     async getInRange(start, end) {
-      return [...tasks.values()]
-        .filter((t) => t.date >= start && t.date <= end)
-        .sort(byCreated);
+      return [...tasks.values()].filter((t) => t.date >= start && t.date <= end).sort(byCreated);
     },
     async save(task) {
       tasks.set(task.id, task);

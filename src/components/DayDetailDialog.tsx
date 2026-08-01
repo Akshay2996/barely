@@ -102,7 +102,12 @@ export function DayDetailDialog() {
             </div>
             <h3 style={{ margin: "2px 0 0" }}>{dd.label}</h3>
           </div>
-          <button className="btn btn-icon" onClick={close} aria-label="Close" style={{ flex: "none" }}>
+          <button
+            className="btn btn-icon"
+            onClick={close}
+            aria-label="Close"
+            style={{ flex: "none" }}
+          >
             <Icon name="x" size={16} />
           </button>
         </div>
@@ -121,33 +126,33 @@ export function DayDetailDialog() {
           </p>
 
           {dd.isRest && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              textAlign: "center",
-              gap: 10,
-              padding: "var(--space-4) 0",
-            }}
-          >
-            <span
+            <div
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 999,
-                background: "var(--color-neutral-200)",
-                color: "var(--color-neutral-600)",
-                display: "grid",
-                placeItems: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                gap: 10,
+                padding: "var(--space-4) 0",
               }}
             >
-              <Icon name="moon" size={24} strokeWidth={2.5} />
-            </span>
-            <div className="text-muted" style={{ fontSize: 14 }}>
-              A quiet day. No entries - and no guilt about it.
+              <span
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 999,
+                  background: "var(--color-neutral-200)",
+                  color: "var(--color-neutral-600)",
+                  display: "grid",
+                  placeItems: "center",
+                }}
+              >
+                <Icon name="moon" size={24} strokeWidth={2.5} />
+              </span>
+              <div className="text-muted" style={{ fontSize: 14 }}>
+                A quiet day. No entries - and no guilt about it.
+              </div>
             </div>
-          </div>
           )}
 
           <ItemList items={dd.work} section="work" />

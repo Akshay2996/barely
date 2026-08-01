@@ -41,8 +41,8 @@ The layers depend downward only. Components read/write through hooks and stores;
 
 Two Zustand stores, deliberately separated by concern:
 
-- **`appStore`** — screen routing, persisted `settings` (onboarding, reminder time/toggle, carry toggle, tone), the check-in draft state, toast, day-detail dialog, and voice (`listening` section + live `transcript`). Settings are persisted to `localStorage` under `barely-settings`.
-- **`taskStore`** — the current day's tasks and the carry-over "pending" item. It is created via `createTaskStore(repo)` so a different repository can be injected in tests.
+- **`appStore`** - screen routing, persisted `settings` (onboarding, reminder time/toggle, carry toggle, tone), the check-in draft state, toast, day-detail dialog, and voice (`listening` section + live `transcript`). Settings are persisted to `localStorage` under `barely-settings`.
+- **`taskStore`** - the current day's tasks and the carry-over "pending" item. It is created via `createTaskStore(repo)` so a different repository can be injected in tests.
 
 Components subscribe with selectors (`useAppStore(s => s.screen)`) to minimize re-renders.
 
@@ -101,7 +101,7 @@ Configured in `vite.config.ts` via `vite-plugin-pwa` (Workbox, `registerType: au
 
 ## Responsive & cross-platform
 
-- **Breakpoints** live in `src/index.css`. At **≤840px** the desktop top nav collapses and the floating bottom tab bar + FAB appear — both flip at the _same_ breakpoint so there's never a state without navigation (this covers iPad portrait ~820px).
+- **Breakpoints** live in `src/index.css`. At **≤840px** the desktop top nav collapses and the floating bottom tab bar + FAB appear - both flip at the _same_ breakpoint so there's never a state without navigation (this covers iPad portrait ~820px).
 - **Safe-area insets** (`env(safe-area-inset-*)`) are applied to the top nav, bottom tab bar, and FAB so content clears notches and home indicators on iOS.
 - **iOS zoom** is avoided by using 16px inputs; tap highlight, long-press callout, and the 300ms tap delay are neutralized globally.
 

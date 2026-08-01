@@ -62,7 +62,6 @@ interface AppActions {
   setPersonalInput: (v: string) => void;
   addDraft: (which: Section) => void;
   removeDraft: (which: Section, index: number) => void;
-  resetCheckin: () => void;
   // settings
   updateSettings: (patch: Partial<Settings>) => void;
   completeOnboarding: () => void;
@@ -103,8 +102,7 @@ export const useAppStore = create<AppState & AppActions>((set) => {
 
     go: (screen) => set({ screen, dayDetail: null }),
 
-    startNewDay: () =>
-      set({ screen: "checkin", checkin: { ...emptyCheckin }, dayDetail: null }),
+    startNewDay: () => set({ screen: "checkin", checkin: { ...emptyCheckin }, dayDetail: null }),
 
     beginCheckin: () => set((s) => ({ checkin: { ...s.checkin, step: 1 } })),
     setStep: (n) => set((s) => ({ checkin: { ...s.checkin, step: n } })),
@@ -136,8 +134,6 @@ export const useAppStore = create<AppState & AppActions>((set) => {
         arr.splice(index, 1);
         return { checkin: { ...c, draftPersonal: arr } };
       }),
-
-    resetCheckin: () => set({ checkin: { ...emptyCheckin } }),
 
     updateSettings: (patch) =>
       set((s) => {

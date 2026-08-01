@@ -26,7 +26,13 @@ export function VoiceOverlay() {
       <div
         className="card elev-lg"
         onClick={(e) => e.stopPropagation()}
-        style={{ width: "100%", maxWidth: 400, alignItems: "center", textAlign: "center", gap: "var(--space-3)" }}
+        style={{
+          width: "100%",
+          maxWidth: 400,
+          alignItems: "center",
+          textAlign: "center",
+          gap: "var(--space-3)",
+        }}
       >
         <div
           style={{

@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Barely is deliberately minimal — it helps people do *less*, kindly. Please explain how your idea fits that philosophy.
+        Barely is deliberately minimal - it helps people do *less*, kindly. Please explain how your idea fits that philosophy.
   - type: textarea
     id: problem
     attributes:

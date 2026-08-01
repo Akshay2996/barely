@@ -34,14 +34,6 @@ export type Screen = "onboarding" | "checkin" | "today" | "progress" | "reminder
 
 // ── Calendar / history ────────────────────────────────────────────────
 
-export interface DayCount {
-  count: number; // completed items that day
-  total: number;
-}
-
-/** date -> stats */
-export type CalendarData = Record<string, DayCount>;
-
 export interface DayDetailItem {
   text: string;
   done: boolean;

@@ -83,7 +83,11 @@ export function Reminders() {
     if (permission === "default") granted = (await requestPermission()) === "granted";
     // Uses the service worker on mobile (where `new Notification` is forbidden)
     // and the constructor on desktop.
-    if (granted) await showNudge("Time to open your laptop", "Your three things are waiting. Barely counts - remember?");
+    if (granted)
+      await showNudge(
+        "Time to open your laptop",
+        "Your three things are waiting. Barely counts - remember?",
+      );
     showToast(
       "Time to open your laptop",
       "Your three things are waiting. Barely counts - remember?",
@@ -171,11 +175,20 @@ export function Reminders() {
                 flexWrap: "wrap",
               }}
             >
-              <label style={{ fontSize: 14, color: "color-mix(in srgb, var(--color-text) 70%, transparent)" }}>
+              <label
+                style={{
+                  fontSize: 14,
+                  color: "color-mix(in srgb, var(--color-text) 70%, transparent)",
+                }}
+              >
                 Nudge me at
               </label>
               <TimePicker value={settings.reminderTime} onChange={onTimeChange} />
-              <button className="btn btn-secondary" onClick={sendTestNudge} style={{ marginLeft: "auto" }}>
+              <button
+                className="btn btn-secondary"
+                onClick={sendTestNudge}
+                style={{ marginLeft: "auto" }}
+              >
                 <Icon name="bell" size={16} />
                 Send a test nudge
               </button>
@@ -249,7 +262,11 @@ export function Reminders() {
             Off by default. No task should follow you around.
           </div>
         </div>
-        <Switch on={settings.carryEnabled} onChange={toggleCarry} color="var(--color-accent-2-500)" />
+        <Switch
+          on={settings.carryEnabled}
+          onChange={toggleCarry}
+          color="var(--color-accent-2-500)"
+        />
       </div>
     </section>
   );

@@ -16,15 +16,7 @@ const tabStyle: React.CSSProperties = {
   padding: "4px 8px",
 };
 
-function Tab({
-  target,
-  label,
-  icon,
-}: {
-  target: Screen;
-  label: string;
-  icon: IconName;
-}) {
+function Tab({ target, label, icon }: { target: Screen; label: string; icon: IconName }) {
   const screen = useAppStore((s) => s.screen);
   const go = useAppStore((s) => s.go);
   return (

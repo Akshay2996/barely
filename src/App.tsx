@@ -140,7 +140,8 @@ export default function App() {
           width: 480,
           height: 480,
           borderRadius: "50%",
-          background: "radial-gradient(circle at center, var(--color-accent-2-200), transparent 68%)",
+          background:
+            "radial-gradient(circle at center, var(--color-accent-2-200), transparent 68%)",
           opacity: 0.5,
           pointerEvents: "none",
           filter: "blur(6px)",

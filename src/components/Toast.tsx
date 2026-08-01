@@ -48,7 +48,12 @@ export function Toast() {
             {toast.body}
           </div>
         </div>
-        <button className="btn btn-icon" onClick={dismiss} aria-label="Dismiss" style={{ width: 28, height: 28 }}>
+        <button
+          className="btn btn-icon"
+          onClick={dismiss}
+          aria-label="Dismiss"
+          style={{ width: 28, height: 28 }}
+        >
           <Icon name="x" size={16} />
         </button>
       </div>

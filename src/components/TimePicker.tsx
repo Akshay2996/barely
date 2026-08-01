@@ -68,7 +68,7 @@ export function TimePicker({
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const { hour12, minute, period } = parse(value);
-  const selMinute = MINUTES.includes(minute) ? minute : Math.round(minute / 5) * 5 % 60;
+  const selMinute = MINUTES.includes(minute) ? minute : (Math.round(minute / 5) * 5) % 60;
 
   useEffect(() => {
     if (!open) return;
@@ -131,7 +131,11 @@ export function TimePicker({
               ))}
             </div>
           </div>
-          <button type="button" className="btn btn-primary btn-block" onClick={() => setOpen(false)}>
+          <button
+            type="button"
+            className="btn btn-primary btn-block"
+            onClick={() => setOpen(false)}
+          >
             Done
           </button>
         </div>

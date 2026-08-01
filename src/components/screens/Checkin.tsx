@@ -79,9 +79,7 @@ function DraftChips({ section }: { section: Section }) {
 function InputRow({ section }: { section: Section }) {
   const isWork = section === "work";
   const input = useAppStore((s) => (isWork ? s.checkin.workInput : s.checkin.personalInput));
-  const drafts = useAppStore((s) =>
-    isWork ? s.checkin.draftWork : s.checkin.draftPersonal,
-  );
+  const drafts = useAppStore((s) => (isWork ? s.checkin.draftWork : s.checkin.draftPersonal));
   const setInput = useAppStore((s) => (isWork ? s.setWorkInput : s.setPersonalInput));
   const addDraft = useAppStore((s) => s.addDraft);
   const startListening = useAppStore((s) => s.startListening);
@@ -133,9 +131,7 @@ function InputRow({ section }: { section: Section }) {
 
 function StepQuestion({ section }: { section: Section }) {
   const isWork = section === "work";
-  const drafts = useAppStore((s) =>
-    isWork ? s.checkin.draftWork : s.checkin.draftPersonal,
-  );
+  const drafts = useAppStore((s) => (isWork ? s.checkin.draftWork : s.checkin.draftPersonal));
   const setStep = useAppStore((s) => s.setStep);
   const existing = useExistingCount(section);
   const cap = Math.max(0, MAX - existing);
@@ -181,10 +177,7 @@ function StepQuestion({ section }: { section: Section }) {
           marginTop: "var(--space-3)",
         }}
       >
-        <a
-          onClick={() => setStep(isWork ? 0 : 1)}
-          style={{ cursor: "pointer", fontSize: 14 }}
-        >
+        <a onClick={() => setStep(isWork ? 0 : 1)} style={{ cursor: "pointer", fontSize: 14 }}>
           back
         </a>
         <button className="btn btn-primary" onClick={() => setStep(isWork ? 2 : 3)}>
@@ -198,9 +191,7 @@ function StepQuestion({ section }: { section: Section }) {
 
 function ReviewList({ section }: { section: Section }) {
   const isWork = section === "work";
-  const drafts = useAppStore((s) =>
-    isWork ? s.checkin.draftWork : s.checkin.draftPersonal,
-  );
+  const drafts = useAppStore((s) => (isWork ? s.checkin.draftWork : s.checkin.draftPersonal));
   return (
     <div>
       <div
@@ -216,10 +207,7 @@ function ReviewList({ section }: { section: Section }) {
       </div>
       {drafts.length > 0 ? (
         drafts.map((text, i) => (
-          <div
-            key={i}
-            style={{ display: "flex", gap: 10, alignItems: "center", padding: "3px 0" }}
-          >
+          <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", padding: "3px 0" }}>
             <span
               style={{
                 width: 16,

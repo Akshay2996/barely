@@ -87,9 +87,7 @@ function createTaskStore(repo: ITaskRepository) {
         const yesterday = addDays(date, -1);
         const prev = await repo.getByDate(yesterday);
         const alreadyHere = new Set(tasks.map((t) => t.text.toLowerCase()));
-        const leftover = prev.find(
-          (t) => !t.done && !alreadyHere.has(t.text.toLowerCase()),
-        );
+        const leftover = prev.find((t) => !t.done && !alreadyHere.has(t.text.toLowerCase()));
         if (leftover) carryPending = { text: leftover.text, section: leftover.section };
       }
 

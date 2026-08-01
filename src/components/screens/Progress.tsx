@@ -195,7 +195,12 @@ export function Progress() {
           value={
             <>
               {shown}{" "}
-              <span style={{ fontSize: 18, color: "color-mix(in srgb, var(--color-text) 45%, transparent)" }}>
+              <span
+                style={{
+                  fontSize: 18,
+                  color: "color-mix(in srgb, var(--color-text) 45%, transparent)",
+                }}
+              >
                 of {pastCounts.length} days
               </span>
             </>
@@ -265,10 +270,7 @@ export function Progress() {
           >
             less
             {LEGEND.map((bg, i) => (
-              <span
-                key={i}
-                style={{ width: 13, height: 13, borderRadius: 4, background: bg }}
-              />
+              <span key={i} style={{ width: 13, height: 13, borderRadius: 4, background: bg }} />
             ))}
             more
           </div>
@@ -287,7 +289,9 @@ export function Progress() {
             </div>
           ))}
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>{cells}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 7 }}>
+          {cells}
+        </div>
         <p className="text-muted" style={{ margin: 0, fontSize: 13 }}>
           Tap any day to see what you actually did. Gaps are just gaps.
         </p>
