@@ -33,7 +33,7 @@ The layers depend downward only. Components read/write through hooks and stores;
 | `src/stores/` | `appStore` (UI/settings/check-in/voice) and `taskStore` (today's tasks + carry-over). |
 | `src/repositories/` | `interfaces.ts` (contracts) and `indexeddb.ts` (IndexedDB backend + in-memory fallback). |
 | `src/hooks/` | `useNotifications`, `useVoiceCapture`, `useMonthHistory`, `useInstallPrompt`. |
-| `src/utils/` | `date`, `tone`, `notify`. |
+| `src/utils/` | `date`, `tone`, `notify`, `history` (opt-in demo-data generator). |
 | `src/types/` | Shared domain + Web Speech types. |
 | `src/index.css` | Design tokens (CSS custom properties) and every component style. |
 
@@ -79,7 +79,7 @@ A day holds **at most 3 tasks per section** (`MAX_PER_SECTION` in `taskStore`). 
 
 The Progress calendar reads the user's real tasks via `useMonthHistory(year, month)`, which groups `taskRepository.getInRange()` results by date. A new user's calendar starts empty and fills in as they check in; the arrows browse back up to `HISTORY_MONTHS_BACK` months (in `Progress.tsx`). If storage can't be read, the month is simply empty (no fabricated data).
 
-> Earlier versions seeded deterministic demo history into IndexedDB. That was removed; `taskStore.init` now runs a one-time `purgeLegacySeed` that deletes any residual `seed-*` tasks (real tasks use `crypto.randomUUID()`, so it never touches user data).
+**Demo data (opt-in, off by default).** `utils/history.ts` can deterministically fabricate a few months of sample tasks (a `mulberry32` PRNG seeded by an FNV-1a hash of each date, so a date always yields the same tasks) for demoing/testing. It is wired in `taskStore.init` behind a flag: open the app with `?demo=1` (or set `localStorage["barely:demo"]="1"`) to seed it, `?demo=0` to disable and wipe it. When demo mode is off, `init` runs a one-time `purgeLegacySeed` that removes any stray `seed-*` rows (real tasks use `crypto.randomUUID()`, so user data is never touched).
 
 ## Notifications
 
@@ -105,6 +105,7 @@ Configured in `vite.config.ts` via `vite-plugin-pwa` (Workbox, `registerType: au
 
 ## Testing hooks
 
+- **Demo data:** open the app with `?demo=1` (or set `localStorage["barely:demo"]="1"`) to seed a few months of sample history into the Progress calendar; `?demo=0` disables and wipes it. Off by default. Great for a new person kicking the tires.
 - **Date override:** set `localStorage["barely:test-today"]` to a `YYYY-MM-DD` string to make `today()` return a simulated day. Useful for exercising carry-over across a day boundary. Ignored in normal use.
 
 ## Conventions

@@ -3,12 +3,60 @@ import type { Task, Section } from "@/types";
 import type { ITaskRepository } from "@/repositories/interfaces";
 import { taskRepository } from "@/repositories/indexeddb";
 import { today, addDays } from "@/utils/date";
+import { generateSeedHistory, SEED_MONTHS_BACK } from "@/utils/history";
 
-// One-time cleanup of the demo/seed history that earlier versions wrote. Seed
-// tasks have ids prefixed "seed-"; real tasks use crypto.randomUUID(), so this
-// only ever removes mock data and never touches the user's own entries.
-const PURGE_FLAG = "barely:seed-purged";
+// ── Demo / test data (opt-in) ─────────────────────────────────────────
+// Real users start with an empty calendar. For demos or testing, sample
+// history can be seeded into IndexedDB. It is OFF by default and never runs in
+// normal use, so the deployed app stays clean.
+//
+//   Enable : open the app with `?demo=1` (or localStorage["barely:demo"]="1"),
+//            then reload -> a few months of sample tasks are generated.
+//   Disable: open with `?demo=0` -> the flag + sample data are removed on the
+//            next load.
+const DEMO_FLAG = "barely:demo"; // set = seed sample data
+const SEED_FLAG = "barely:seeded:v2"; // guard so we only seed once
+const PURGE_FLAG = "barely:seed-purged"; // guard so we only clean up once
 
+/** Whether demo/sample history is enabled (URL `?demo=` overrides the stored flag). */
+function demoEnabled(): boolean {
+  try {
+    if (typeof localStorage === "undefined") return false;
+    const param =
+      typeof location !== "undefined" && new URLSearchParams(location.search).get("demo");
+    if (param === "1") {
+      localStorage.setItem(DEMO_FLAG, "1");
+      // Clear the guards so demo data (re)seeds even if a stale flag remains.
+      localStorage.removeItem(SEED_FLAG);
+      localStorage.removeItem(PURGE_FLAG);
+    }
+    if (param === "0") {
+      // Turn demo off and let the next purge remove the sample rows.
+      localStorage.removeItem(DEMO_FLAG);
+      localStorage.removeItem(SEED_FLAG);
+      localStorage.removeItem(PURGE_FLAG);
+    }
+    return localStorage.getItem(DEMO_FLAG) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** Seed a deterministic stretch of sample history once (demo mode only). */
+async function seedHistory(repo: ITaskRepository, date: string): Promise<void> {
+  try {
+    if (localStorage.getItem(SEED_FLAG)) return;
+    const tasks = generateSeedHistory(new Date(date + "T00:00:00"), SEED_MONTHS_BACK);
+    if (tasks.length) await repo.saveMany(tasks);
+    localStorage.setItem(SEED_FLAG, "1");
+  } catch {
+    /* storage unavailable - ignore */
+  }
+}
+
+// One-time cleanup of any sample/seed history (ids prefixed "seed-"). Real
+// tasks use crypto.randomUUID(), so this only ever removes mock data and never
+// touches the user's own entries.
 async function purgeLegacySeed(repo: ITaskRepository, date: string): Promise<void> {
   try {
     if (typeof localStorage === "undefined" || localStorage.getItem(PURGE_FLAG)) return;
@@ -71,7 +119,9 @@ function createTaskStore(repo: ITaskRepository) {
 
     init: async (carryEnabled) => {
       const date = today();
-      await purgeLegacySeed(repo, date);
+      // Demo mode seeds sample history; otherwise clean up any stray seed rows.
+      if (demoEnabled()) await seedHistory(repo, date);
+      else await purgeLegacySeed(repo, date);
       const tasks = await repo.getByDate(date);
 
       // Carry-over nudge: surface one unfinished task from yesterday that we

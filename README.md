@@ -15,6 +15,8 @@
 
 ---
 
+> **Just exploring?** Add `?demo=1` to the URL to fill the Progress calendar with sample history so you can see the app with data in it (it's off by default and lives only on your device). Add `?demo=0` to clear it.
+
 ## Why Barely?
 
 Most productivity apps optimize for _more_. Barely optimizes for _enough_. You write down **at most three things** for the day - split between work and personal - and that's it. Make the bed? Counts. Two minutes on the deck? Counts. Rest day? Also allowed. The tone stays kind on purpose.
@@ -96,7 +98,7 @@ src/
 ├─ hooks/             # useNotifications, useVoiceCapture, useMonthHistory, useInstallPrompt
 ├─ stores/            # Zustand stores (appStore, taskStore)
 ├─ repositories/      # Storage layer (IndexedDB + in-memory fallback)
-├─ utils/             # date, tone, notify helpers
+├─ utils/             # date, tone, notify helpers, history (opt-in demo data)
 ├─ types/             # Shared TypeScript types
 └─ index.css          # Design tokens + component styles
 ```
