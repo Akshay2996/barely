@@ -1,0 +1,8 @@
+# Code owners for Barely
+# These owners are automatically requested for review on any pull request that
+# touches matching files. The last matching pattern takes precedence.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repository.
+* @Akshay2996

@@ -1,0 +1,52 @@
+name: 🐞 Bug report
+description: Something isn't working as expected
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug! Please search existing issues first to avoid duplicates.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: When I..., I expected..., but instead...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce it?
+      placeholder: |
+        1. Go to '...'
+        2. Tap on '...'
+        3. See the error
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Desktop browser
+        - Android
+        - iOS
+        - Installed PWA
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser & version
+      placeholder: e.g. Chrome 126, Safari 17
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots / console errors
+      description: Anything else that helps — screenshots, recordings, console output.
+    validations:
+      required: false

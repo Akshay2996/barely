@@ -1,0 +1,36 @@
+name: 💡 Feature request
+description: Suggest an idea for Barely
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Barely is deliberately minimal — it helps people do *less*, kindly. Please explain how your idea fits that philosophy.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: The user need or frustration behind the idea.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like to see happen?
+    validations:
+      required: true
+  - type: textarea
+    id: philosophy
+    attributes:
+      label: How does it fit "the least you can do"?
+      description: Why does this belong in a minimalist tracker rather than adding pressure or clutter?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
