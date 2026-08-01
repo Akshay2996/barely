@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { taskRepository } from "@/repositories/indexeddb";
 import { toDateString } from "@/utils/date";
-import { generateMonthTasks } from "@/utils/history";
 import type { DayDetailItem, Task } from "@/types";
 
 export interface DayHistory {
@@ -27,21 +26,10 @@ function groupTasks(tasks: Task[]): MonthHistory {
   return map;
 }
 
-/** How many days of a month should be filled when generating a fallback. */
-function fallbackUpto(year: number, month: number): number {
-  const now = new Date();
-  if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth())) {
-    return new Date(year, month + 1, 0).getDate() + 1; // an entire past month
-  }
-  if (year === now.getFullYear() && month === now.getMonth()) return now.getDate(); // up to today
-  return 1; // a future month - nothing to show
-}
-
 /**
- * Loads all tasks for the given month from IndexedDB and groups them by date.
- * `version` can be bumped to force a reload (e.g. after toggling a task). If
- * IndexedDB can't be read, falls back to the same deterministic history the
- * seeder uses, so the calendar never breaks or shows blank.
+ * Loads the user's real tasks for the given month from IndexedDB and groups
+ * them by date. `version` can be bumped to force a reload (e.g. after toggling
+ * a task). If storage can't be read, the month is simply empty.
  */
 export function useMonthHistory(year: number, month: number, version = 0): MonthHistory {
   const [history, setHistory] = useState<MonthHistory>({});
@@ -54,12 +42,10 @@ export function useMonthHistory(year: number, month: number, version = 0): Month
     taskRepository
       .getInRange(start, end)
       .then((tasks) => {
-        if (cancelled) return;
-        setHistory(groupTasks(tasks));
+        if (!cancelled) setHistory(groupTasks(tasks));
       })
       .catch(() => {
-        if (cancelled) return;
-        setHistory(groupTasks(generateMonthTasks(year, month, fallbackUpto(year, month))));
+        if (!cancelled) setHistory({});
       });
 
     return () => {

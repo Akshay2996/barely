@@ -3,27 +3,21 @@ import type { Task, Section } from "@/types";
 import type { ITaskRepository } from "@/repositories/interfaces";
 import { taskRepository } from "@/repositories/indexeddb";
 import { today, addDays } from "@/utils/date";
-import { generateSeedHistory, SEED_MONTHS_BACK } from "@/utils/history";
 
-// One-time guard so the demo history is only written on the very first run.
-// (v2 widened the seed from one month to several - bump to re-seed.)
-const SEED_FLAG = "barely:seeded:v2";
+// One-time cleanup of the demo/seed history that earlier versions wrote. Seed
+// tasks have ids prefixed "seed-"; real tasks use crypto.randomUUID(), so this
+// only ever removes mock data and never touches the user's own entries.
+const PURGE_FLAG = "barely:seed-purged";
 
-/**
- * Seed a deterministic stretch of history into IndexedDB the first time the app
- * runs, so the Progress calendar has several months to browse. Only past days
- * are written - today stays owned by the user's real check-in. Failures are
- * swallowed; the calendar has its own deterministic fallback.
- */
-async function seedHistory(repo: ITaskRepository, date: string): Promise<void> {
+async function purgeLegacySeed(repo: ITaskRepository, date: string): Promise<void> {
   try {
-    if (typeof localStorage !== "undefined" && localStorage.getItem(SEED_FLAG)) return;
-    const d = new Date(date + "T00:00:00");
-    const tasks = generateSeedHistory(d, SEED_MONTHS_BACK);
-    if (tasks.length) await repo.saveMany(tasks);
-    localStorage?.setItem(SEED_FLAG, "1");
+    if (typeof localStorage === "undefined" || localStorage.getItem(PURGE_FLAG)) return;
+    const all = await repo.getInRange("2020-01-01", date);
+    const seeds = all.filter((t) => t.id.startsWith("seed-"));
+    if (seeds.length) await Promise.all(seeds.map((t) => repo.remove(t.id)));
+    localStorage.setItem(PURGE_FLAG, "1");
   } catch {
-    /* IndexedDB unavailable - useMonthHistory falls back to generated data. */
+    /* non-critical cleanup - ignore */
   }
 }
 
@@ -77,7 +71,7 @@ function createTaskStore(repo: ITaskRepository) {
 
     init: async (carryEnabled) => {
       const date = today();
-      await seedHistory(repo, date);
+      await purgeLegacySeed(repo, date);
       const tasks = await repo.getByDate(date);
 
       // Carry-over nudge: surface one unfinished task from yesterday that we

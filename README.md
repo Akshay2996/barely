@@ -25,7 +25,7 @@ It runs entirely in the browser, works offline, and installs to your phone's hom
 
 - **Two-question morning check-in** - type your three tiny things, or **speak them** with the built-in voice input (Web Speech API, with a graceful fallback).
 - **Today view** - tap to complete, inline **edit** and **delete**, and a soft progress bar that never nags.
-- **Progress calendar** - a real month-by-month heatmap of what you actually did, backed by IndexedDB, with a deterministic fallback so it's never blank. Tap any past day to see the detail.
+- **Progress calendar** - a real month-by-month heatmap of what you actually did, backed by IndexedDB. Tap any past day to see the detail.
 - **One gentle nudge** - a single, opt-in daily reminder delivered as a real system notification (via the service worker, so it works on Android too).
 - **Carry-over** - optionally bring one unfinished thing to tomorrow. Off by default; no task should follow you around.
 - **Installable PWA** - add to your home screen on **iOS and Android**; fully responsive from phone to desktop, with safe-area support for notches and home indicators.
@@ -96,7 +96,7 @@ src/
 ├─ hooks/             # useNotifications, useVoiceCapture, useMonthHistory, useInstallPrompt
 ├─ stores/            # Zustand stores (appStore, taskStore)
 ├─ repositories/      # Storage layer (IndexedDB + in-memory fallback)
-├─ utils/             # date, tone, history seeding, notify helpers
+├─ utils/             # date, tone, notify helpers
 ├─ types/             # Shared TypeScript types
 └─ index.css          # Design tokens + component styles
 ```

@@ -5,7 +5,9 @@ import { useMonthHistory } from "@/hooks/useMonthHistory";
 import { Icon } from "@/components/Icon";
 import { toneCopy, daySummary } from "@/utils/tone";
 import { toDateString, weekdayLong, monthDay } from "@/utils/date";
-import { SEED_MONTHS_BACK } from "@/utils/history";
+
+// How many months back the calendar arrows let you browse.
+const HISTORY_MONTHS_BACK = 11;
 
 function tint(c: number | null): string {
   if (c == null || c <= 0) return "color-mix(in srgb, var(--color-text) 6%, transparent)";
@@ -75,8 +77,8 @@ export function Progress() {
 
   const first = new Date(y, m, 1).getDay();
 
-  // Month navigation bounds: from SEED_MONTHS_BACK ago up to the current month.
-  const earliest = new Date(now.getFullYear(), now.getMonth() - SEED_MONTHS_BACK, 1);
+  // Month navigation bounds: from HISTORY_MONTHS_BACK ago up to the current month.
+  const earliest = new Date(now.getFullYear(), now.getMonth() - HISTORY_MONTHS_BACK, 1);
   const canPrev = new Date(y, m, 1) > earliest;
   const canNext = !isCurrentMonth;
   const step = (delta: number) =>

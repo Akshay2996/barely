@@ -33,7 +33,7 @@ The layers depend downward only. Components read/write through hooks and stores;
 | `src/stores/` | `appStore` (UI/settings/check-in/voice) and `taskStore` (today's tasks + carry-over). |
 | `src/repositories/` | `interfaces.ts` (contracts) and `indexeddb.ts` (IndexedDB backend + in-memory fallback). |
 | `src/hooks/` | `useNotifications`, `useVoiceCapture`, `useMonthHistory`, `useInstallPrompt`. |
-| `src/utils/` | `date`, `tone`, `history` (deterministic seeding), `notify`. |
+| `src/utils/` | `date`, `tone`, `notify`. |
 | `src/types/` | Shared domain + Web Speech types. |
 | `src/index.css` | Design tokens (CSS custom properties) and every component style. |
 
@@ -61,7 +61,7 @@ Storage is abstracted behind interfaces in `repositories/interfaces.ts` (`ITaskR
 
 ```ts
 interface Task {
-  id: string;          // uuid, or "seed-<date>-<section>-<i>" for demo history
+  id: string;          // crypto.randomUUID()
   date: string;        // YYYY-MM-DD
   section: "work" | "personal";
   text: string;
@@ -75,13 +75,11 @@ interface Reminder { id: "main"; time: string /* HH:MM */; enabled: boolean }
 
 A day holds **at most 3 tasks per section** (`MAX_PER_SECTION` in `taskStore`). The check-in and `commitCheckin` both enforce this, and `commitCheckin` **appends** to any existing tasks rather than replacing them.
 
-## Progress history & seeding
+## Progress history
 
-The Progress calendar reads real tasks via `useMonthHistory(year, month)`, which groups `taskRepository.getInRange()` results by date. To avoid a blank calendar for new users:
+The Progress calendar reads the user's real tasks via `useMonthHistory(year, month)`, which groups `taskRepository.getInRange()` results by date. A new user's calendar starts empty and fills in as they check in; the arrows browse back up to `HISTORY_MONTHS_BACK` months (in `Progress.tsx`). If storage can't be read, the month is simply empty (no fabricated data).
 
-- `utils/history.ts` generates **deterministic** demo tasks from a seeded PRNG (`mulberry32` seeded by an FNV-1a hash of the date), so a given date always yields the same tasks.
-- On first run, `taskStore` seeds several months of history into IndexedDB (guarded by a `localStorage` flag).
-- If a month can't be read from storage, `useMonthHistory` falls back to the same deterministic generator, so the calendar is never empty and never breaks.
+> Earlier versions seeded deterministic demo history into IndexedDB. That was removed; `taskStore.init` now runs a one-time `purgeLegacySeed` that deletes any residual `seed-*` tasks (real tasks use `crypto.randomUUID()`, so it never touches user data).
 
 ## Notifications
 
