@@ -6,6 +6,9 @@
 
 **The least you can do.** A gentle, offline-first daily tracker for people who just need three tiny things done today - not another guilt-machine to-do app.
 
+### 🌱 [Try it live → barelytrack.vercel.app](https://barelytrack.vercel.app/)
+
+[![Live](https://img.shields.io/badge/live-barelytrack.vercel.app-c67139.svg)](https://barelytrack.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-c67139.svg)](LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-installable-7a8a5e.svg)](#install-it-add-to-home-screen)
 [![Built with React + TypeScript](https://img.shields.io/badge/React%2018-TypeScript-c67139.svg)](#tech-stack)
@@ -15,7 +18,7 @@
 
 ---
 
-> **Just exploring?** Add `?demo=1` to the URL to fill the Progress calendar with sample history so you can see the app with data in it (it's off by default and lives only on your device). Add `?demo=0` to clear it.
+> **Just exploring?** Open **[barelytrack.vercel.app/?demo=1](https://barelytrack.vercel.app/?demo=1)** to fill the Progress calendar with sample history so you can see the app with data in it (it's off by default and lives only on your device). Add `?demo=0` to clear it.
 
 ## Why Barely?
 
@@ -80,10 +83,10 @@ npm run dev
 
 ## Install it (Add to Home Screen)
 
-Barely is a PWA, so you can install it like an app:
+Barely is a PWA, so you can install it like an app. Open **[barelytrack.vercel.app](https://barelytrack.vercel.app/)** on your device, then:
 
-- **Android (Chrome):** open the site → menu (⋮) → **Install app** / **Add to Home screen**.
-- **iOS (Safari):** open the site → Share → **Add to Home Screen**.
+- **Android (Chrome):** menu (⋮) → **Install app** / **Add to Home screen**.
+- **iOS (Safari):** Share → **Add to Home Screen**.
 - **Desktop (Chrome/Edge):** click the install icon in the address bar.
 
 Once installed it launches full-screen and the daily nudge can fire as a real notification.
