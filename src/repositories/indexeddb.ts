@@ -24,6 +24,7 @@ const byCreated = (a: Task, b: Task) => a.createdAt - b.createdAt;
 
 interface Backend {
   readonly persistent: boolean;
+  getAll(): Promise<Task[]>;
   getByDate(date: string): Promise<Task[]>;
   getInRange(start: string, end: string): Promise<Task[]>;
   save(task: Task): Promise<void>;
@@ -37,6 +38,9 @@ interface Backend {
 function createIdbBackend(db: IDBPDatabase<BarelySchema>): Backend {
   return {
     persistent: true,
+    async getAll() {
+      return (await db.getAll("tasks")).sort(byCreated);
+    },
     async getByDate(date) {
       return (await db.getAllFromIndex("tasks", "by-date", date)).sort(byCreated);
     },
@@ -75,6 +79,9 @@ function createMemoryBackend(): Backend {
   let reminder: Reminder | undefined;
   return {
     persistent: false,
+    async getAll() {
+      return [...tasks.values()].sort(byCreated);
+    },
     async getByDate(date) {
       return [...tasks.values()].filter((t) => t.date === date).sort(byCreated);
     },
@@ -182,6 +189,9 @@ export async function storageIsPersistent(): Promise<boolean> {
 // ── Task Repository ───────────────────────────────────────────────────
 
 export class TaskRepository implements ITaskRepository {
+  async getAll(): Promise<Task[]> {
+    return (await getBackend()).getAll();
+  }
   async getByDate(date: string): Promise<Task[]> {
     return (await getBackend()).getByDate(date);
   }

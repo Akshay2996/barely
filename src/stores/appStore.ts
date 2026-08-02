@@ -3,7 +3,7 @@ import type { Screen, Section, Settings, ToastItem, DayDetail, Tone } from "@/ty
 
 // ── Settings persistence (localStorage) ───────────────────────────────
 
-const SETTINGS_KEY = "barely-settings";
+export const SETTINGS_KEY = "barely-settings";
 
 const DEFAULT_SETTINGS: Settings = {
   onboarded: false,

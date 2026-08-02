@@ -1,8 +1,10 @@
+import { useRef } from "react";
 import { useAppStore } from "@/stores/appStore";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { reminderRepository } from "@/repositories/indexeddb";
 import { showNudge } from "@/utils/notify";
+import { exportBackup, importBackupFromFile } from "@/utils/backup";
 import { Icon } from "@/components/Icon";
 import { TimePicker } from "@/components/TimePicker";
 
@@ -60,6 +62,32 @@ export function Reminders() {
   const showToast = useAppStore((s) => s.showToast);
   const { permission, requestPermission } = useNotifications();
   const { canInstall, promptInstall } = useInstallPrompt();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onExport = async () => {
+    try {
+      await exportBackup();
+      showToast("Backup downloaded", "Keep it safe - you can import it on any device or browser.");
+    } catch {
+      showToast("Couldn't export", "Something went wrong building the backup file.");
+    }
+  };
+
+  const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file later
+    if (!file) return;
+    try {
+      const { tasks } = await importBackupFromFile(file);
+      showToast("Backup restored", `Imported ${tasks} task${tasks === 1 ? "" : "s"}. Reloading...`);
+      setTimeout(() => location.reload(), 1000);
+    } catch (err) {
+      showToast(
+        "Couldn't import",
+        err instanceof Error ? err.message : "That file couldn't be read.",
+      );
+    }
+  };
 
   const saveReminder = (enabled: boolean, time: string) => {
     reminderRepository.save({ id: "main", enabled, time });
@@ -267,6 +295,49 @@ export function Reminders() {
           onChange={toggleCarry}
           color="var(--color-accent-2-500)"
         />
+      </div>
+
+      <div className="card elev-sm" style={{ gap: "var(--space-3)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+          <span
+            style={{
+              width: 40,
+              height: 40,
+              flex: "none",
+              borderRadius: 999,
+              background: "var(--color-accent-2-100)",
+              color: "var(--color-accent-2-700)",
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            <Icon name="database" size={20} />
+          </span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600 }}>Back up your data</div>
+            <div className="text-muted" style={{ fontSize: 13 }}>
+              Save everything to a file, then restore it on a new device or browser. It all stays on
+              your device.
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button className="btn btn-secondary" onClick={onExport}>
+            <Icon name="download" size={16} />
+            Export backup
+          </button>
+          <button className="btn btn-secondary" onClick={() => fileRef.current?.click()}>
+            <Icon name="upload" size={16} />
+            Import backup
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={onImportFile}
+            style={{ display: "none" }}
+          />
+        </div>
       </div>
     </section>
   );
