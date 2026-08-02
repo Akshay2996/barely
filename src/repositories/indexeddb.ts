@@ -118,15 +118,26 @@ function getBackend(): Promise<Backend> {
   if (!_backend) {
     _backend = withTimeout(
       openDB<BarelySchema>(DB_NAME, DB_VERSION, {
-        upgrade(db) {
-          // The v1 task shape (type/completed) differs from v2 (section/done);
-          // drop and recreate so we never mix shapes.
-          if (db.objectStoreNames.contains("tasks")) db.deleteObjectStore("tasks");
-          const tasks = db.createObjectStore("tasks", { keyPath: "id" });
-          tasks.createIndex("by-date", "date");
-          if (!db.objectStoreNames.contains("reminders")) {
-            db.createObjectStore("reminders", { keyPath: "id" });
+        upgrade(db, oldVersion) {
+          // Fresh install or pre-v2 database. The old v1 task shape
+          // (type/completed) is incompatible with v2 (section/done) and there's
+          // nothing worth keeping, so (re)create the stores. This branch runs
+          // ONLY for new installs and pre-v2 DBs - existing v2 users never hit
+          // it, so their data is preserved.
+          if (oldVersion < 2) {
+            if (db.objectStoreNames.contains("tasks")) db.deleteObjectStore("tasks");
+            const tasks = db.createObjectStore("tasks", { keyPath: "id" });
+            tasks.createIndex("by-date", "date");
+            if (!db.objectStoreNames.contains("reminders")) {
+              db.createObjectStore("reminders", { keyPath: "id" });
+            }
           }
+
+          // Future schema changes MUST be non-destructive so nobody loses data.
+          // Bump DB_VERSION and add a guarded migration here, e.g.:
+          //   if (oldVersion < 3) {
+          //     // add an index / backfill a field - never deleteObjectStore("tasks")
+          //   }
         },
         blocked() {
           // Another tab is holding an older version open, blocking our upgrade.

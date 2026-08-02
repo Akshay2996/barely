@@ -16,6 +16,7 @@ import { DayDetailDialog } from "@/components/DayDetailDialog";
 import { VoiceOverlay } from "@/components/VoiceOverlay";
 import { Toast } from "@/components/Toast";
 import { storageIsPersistent } from "@/repositories/indexeddb";
+import { requestPersistentStorage } from "@/utils/storage";
 
 /** Floating "new day" action button - shown on mobile/tablet (where the top
  *  "New day" button is hidden), pinned to the side above the bottom tab bar. */
@@ -92,6 +93,11 @@ export default function App() {
   // Drive the recurring reminder scheduling + voice capture.
   useNotifications({ schedule: true });
   useVoiceCapture();
+
+  // Ask the browser to keep our data from being evicted (best-effort).
+  useEffect(() => {
+    requestPersistentStorage();
+  }, []);
 
   // Load today's tasks (and the carry-over nudge) on mount and when the
   // carry-over setting changes.
