@@ -41,10 +41,23 @@ function FlowHeader() {
         position: "relative",
         zIndex: 1,
         padding: "var(--space-6) var(--space-4) 0",
-        display: "flex",
-        justifyContent: "center",
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
+        alignItems: "center",
       }}
     >
+      {/* Escape hatch: return to Today (e.g. if the + was tapped by mistake). */}
+      <button
+        type="button"
+        onClick={() => go("today")}
+        aria-label="Back to today"
+        title="Back to today"
+        className="btn btn-secondary"
+        style={{ justifySelf: "start", gap: 6, padding: "6px 14px" }}
+      >
+        <Icon name="arrowLeft" size={16} />
+        Back
+      </button>
       <button
         type="button"
         onClick={() => go("today")}
@@ -65,6 +78,7 @@ function FlowHeader() {
         <LeafBadge />
         Barely
       </button>
+      <span aria-hidden="true" />
     </div>
   );
 }
