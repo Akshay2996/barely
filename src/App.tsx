@@ -17,6 +17,7 @@ import { VoiceOverlay } from "@/components/VoiceOverlay";
 import { Toast } from "@/components/Toast";
 import { storageIsPersistent } from "@/repositories/indexeddb";
 import { requestPersistentStorage } from "@/utils/storage";
+import { syncNow, scheduleSync } from "@/utils/syncManager";
 
 /** Floating "new day" action button - shown on mobile/tablet (where the top
  *  "New day" button is hidden), pinned to the side above the bottom tab bar. */
@@ -121,6 +122,26 @@ export default function App() {
       cancelled = true;
     };
   }, [showToast]);
+
+  // Automatic sync (if a method is enabled): once on load, whenever the app
+  // regains focus/connectivity, and shortly after any task change.
+  useEffect(() => {
+    void syncNow().catch(() => {});
+    const onFocus = () => scheduleSync(0);
+    const onVisible = () => document.visibilityState === "visible" && scheduleSync(0);
+    window.addEventListener("online", onFocus);
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisible);
+    const unsub = useTaskStore.subscribe((s, prev) => {
+      if (s.tasks !== prev.tasks) scheduleSync();
+    });
+    return () => {
+      window.removeEventListener("online", onFocus);
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisible);
+      unsub();
+    };
+  }, []);
 
   const showFullHeader = screen === "today" || screen === "progress" || screen === "reminders";
   // Onboarding renders its own hero brand, so the compact flow header is only

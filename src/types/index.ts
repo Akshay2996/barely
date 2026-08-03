@@ -10,6 +10,12 @@ export interface Task {
   done: boolean;
   carried: boolean;
   createdAt: number;
+  // Sync metadata. `updatedAt` drives last-write-wins merges; `deleted` is a
+  // soft-delete tombstone so removals propagate across devices instead of
+  // resurrecting. Both are optional for backwards-compat with pre-sync rows
+  // (treat a missing `updatedAt` as `createdAt`).
+  updatedAt?: number;
+  deleted?: boolean;
 }
 
 export interface Reminder {

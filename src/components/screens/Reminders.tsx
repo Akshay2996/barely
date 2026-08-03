@@ -1,10 +1,18 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useAppStore } from "@/stores/appStore";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 import { reminderRepository } from "@/repositories/indexeddb";
 import { showNudge } from "@/utils/notify";
 import { exportBackup, importBackupFromFile } from "@/utils/backup";
+import {
+  isGoogleDriveConfigured,
+  isGoogleDriveConnected,
+  googleAccountEmail,
+  connectGoogleDrive,
+  disconnectGoogleDrive,
+} from "@/utils/googleDrive";
+import { syncNow } from "@/utils/syncManager";
 import { Icon } from "@/components/Icon";
 import { TimePicker } from "@/components/TimePicker";
 
@@ -87,6 +95,53 @@ export function Reminders() {
         err instanceof Error ? err.message : "That file couldn't be read.",
       );
     }
+  };
+
+  // ── Google Drive sync ──
+  const [driveConnected, setDriveConnected] = useState(isGoogleDriveConnected());
+  const [driveEmail, setDriveEmail] = useState(googleAccountEmail());
+  const [syncing, setSyncing] = useState(false);
+
+  const connectDrive = async () => {
+    try {
+      const { email } = await connectGoogleDrive();
+      setDriveConnected(true);
+      setDriveEmail(email);
+      setSyncing(true);
+      const res = await syncNow();
+      showToast(
+        "Google Drive connected",
+        res
+          ? `${res.tasks} task${res.tasks === 1 ? "" : "s"} in sync across your devices.`
+          : "Ready to sync.",
+      );
+    } catch (err) {
+      showToast("Couldn't connect", err instanceof Error ? err.message : "Google sign-in failed.");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const runSyncNow = async () => {
+    setSyncing(true);
+    try {
+      const res = await syncNow();
+      showToast(
+        "Synced",
+        res ? `${res.tasks} task${res.tasks === 1 ? "" : "s"} in sync.` : "Nothing to sync.",
+      );
+    } catch (err) {
+      showToast("Sync failed", err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const disconnectDrive = () => {
+    disconnectGoogleDrive();
+    setDriveConnected(false);
+    setDriveEmail(null);
+    showToast("Disconnected", "This device no longer syncs to Google Drive.");
   };
 
   const saveReminder = (enabled: boolean, time: string) => {
@@ -296,6 +351,56 @@ export function Reminders() {
           color="var(--color-accent-2-500)"
         />
       </div>
+
+      {isGoogleDriveConfigured() && (
+        <div className="card elev-sm" style={{ gap: "var(--space-3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+            <span
+              style={{
+                width: 40,
+                height: 40,
+                flex: "none",
+                borderRadius: 999,
+                background: "var(--color-accent-100)",
+                color: "var(--color-accent-700)",
+                display: "grid",
+                placeItems: "center",
+              }}
+            >
+              <Icon name="cloud" size={20} />
+            </span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>Sync with Google Drive</div>
+              <div className="text-muted" style={{ fontSize: 13 }}>
+                {driveConnected
+                  ? `Connected as ${driveEmail ?? "your Google account"}. Your phone and laptop stay in sync automatically.`
+                  : "Keep your phone and laptop in sync automatically. Your data stays in your own Google Drive - no account with us."}
+              </div>
+            </div>
+            {driveConnected ? (
+              <button className="btn btn-secondary" onClick={runSyncNow} disabled={syncing}>
+                <Icon name="refreshCw" size={16} />
+                {syncing ? "Syncing..." : "Sync now"}
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={connectDrive} disabled={syncing}>
+                Connect
+              </button>
+            )}
+          </div>
+          {driveConnected && (
+            <div style={{ display: "flex" }}>
+              <button
+                className="btn btn-ghost"
+                onClick={disconnectDrive}
+                style={{ marginLeft: "auto", fontSize: 13 }}
+              >
+                Disconnect
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="card elev-sm" style={{ gap: "var(--space-3)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
