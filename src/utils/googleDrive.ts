@@ -10,7 +10,14 @@ import type { SyncProvider } from "@/utils/sync";
 // account), which needs only basic OAuth consent setup - no sensitive/restricted
 // verification and no 100-user cap.
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+// The Vercel/`.env` build-time var wins if set; otherwise fall back to Barely's
+// public OAuth client id. A Google client id is not a secret - it ships in the
+// bundle either way and only works from its Authorized JavaScript origins
+// (barelytrack.vercel.app + localhost), so committing it is safe. Forks can
+// override it with their own VITE_GOOGLE_CLIENT_ID.
+const CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "296481444111-7oid7daud02rhebcij7iqkuel0pi7shp.apps.googleusercontent.com";
 const SCOPES = [
   "https://www.googleapis.com/auth/drive.appdata",
   "https://www.googleapis.com/auth/userinfo.email",
