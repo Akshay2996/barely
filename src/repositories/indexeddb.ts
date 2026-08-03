@@ -38,16 +38,20 @@ interface Backend {
 function createIdbBackend(db: IDBPDatabase<BarelySchema>): Backend {
   return {
     persistent: true,
+    // getAll includes tombstones (deleted rows) - sync/backup needs them.
     async getAll() {
       return (await db.getAll("tasks")).sort(byCreated);
     },
+    // Date-scoped reads feed the UI, so they hide soft-deleted rows.
     async getByDate(date) {
-      return (await db.getAllFromIndex("tasks", "by-date", date)).sort(byCreated);
+      return (await db.getAllFromIndex("tasks", "by-date", date))
+        .filter((t) => !t.deleted)
+        .sort(byCreated);
     },
     async getInRange(start, end) {
-      return (await db.getAllFromIndex("tasks", "by-date", IDBKeyRange.bound(start, end))).sort(
-        byCreated,
-      );
+      return (await db.getAllFromIndex("tasks", "by-date", IDBKeyRange.bound(start, end)))
+        .filter((t) => !t.deleted)
+        .sort(byCreated);
     },
     async save(task) {
       await db.put("tasks", task);
@@ -83,10 +87,12 @@ function createMemoryBackend(): Backend {
       return [...tasks.values()].sort(byCreated);
     },
     async getByDate(date) {
-      return [...tasks.values()].filter((t) => t.date === date).sort(byCreated);
+      return [...tasks.values()].filter((t) => t.date === date && !t.deleted).sort(byCreated);
     },
     async getInRange(start, end) {
-      return [...tasks.values()].filter((t) => t.date >= start && t.date <= end).sort(byCreated);
+      return [...tasks.values()]
+        .filter((t) => t.date >= start && t.date <= end && !t.deleted)
+        .sort(byCreated);
     },
     async save(task) {
       tasks.set(task.id, task);

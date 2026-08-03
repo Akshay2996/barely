@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barely - Privacy Policy</title>
+    <style>
+      body {
+        margin: 0 auto;
+        max-width: 42rem;
+        padding: 3rem 1.25rem 5rem;
+        background: #f5ead8;
+        color: #201e1d;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        line-height: 1.6;
+      }
+      h1 {
+        font-size: 1.9rem;
+      }
+      h2 {
+        margin-top: 2rem;
+        font-size: 1.2rem;
+      }
+      a {
+        color: #c67139;
+      }
+      .muted {
+        color: #6b645c;
+        font-size: 0.9rem;
+      }
+      code {
+        background: #ebddc5;
+        padding: 0 4px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Barely - Privacy Policy</h1>
+    <p class="muted">Last updated: August 2026</p>
+
+    <p>
+      Barely is a small, offline-first daily tracker. It has no accounts and no analytics, and it
+      does not sell, share, or transmit your data to us. This page explains what happens to your
+      data, including the optional Google Drive sync.
+    </p>
+
+    <h2>What data Barely stores</h2>
+    <p>
+      Your tasks and settings are stored <strong>on your own device</strong> (in the browser's
+      IndexedDB and localStorage). We do not operate a server that receives or stores your task
+      data.
+    </p>
+
+    <h2>Export / Import backup</h2>
+    <p>
+      You can export a JSON file of your data and import it later. That file is created and read
+      entirely on your device; it is only shared if you choose to move it somewhere yourself.
+    </p>
+
+    <h2>Optional Google Drive sync</h2>
+    <p>
+      If you choose to enable Google Drive sync, Barely requests permission to store a single file
+      in your Google account's hidden, per-app storage area (the
+      <code>drive.appdata</code> folder) using the
+      <code>https://www.googleapis.com/auth/drive.appdata</code> scope, and reads your email
+      address (<code>userinfo.email</code>) only to show which account is connected.
+    </p>
+    <ul>
+      <li>The data is stored in <strong>your own Google Drive</strong>, not on our servers.</li>
+      <li>Only Barely, signed in as you, can access that file. Other apps cannot see it.</li>
+      <li>
+        We do not receive, read, or retain your Google data. The browser talks to Google directly.
+      </li>
+      <li>You can disconnect at any time in the app, and revoke access in your Google Account.</li>
+    </ul>
+    <p>
+      Barely's use of information received from Google APIs adheres to the
+      <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener"
+        >Google API Services User Data Policy</a
+      >, including the Limited Use requirements.
+    </p>
+
+    <h2>Notifications</h2>
+    <p>
+      If you enable the daily reminder and grant notification permission, notifications are
+      scheduled and shown by your own device/browser. No notification data leaves your device.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions? Open an issue at
+      <a href="https://github.com/Akshay2996/barely" rel="noopener">github.com/Akshay2996/barely</a>.
+    </p>
+
+    <p><a href="/">&larr; Back to Barely</a></p>
+  </body>
+</html>

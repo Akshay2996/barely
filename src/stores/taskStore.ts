@@ -98,6 +98,7 @@ interface TaskActions {
 export const MAX_PER_SECTION = 3;
 
 function mkTask(date: string, text: string, section: Section, carried = false): Task {
+  const now = Date.now() + Math.floor(Math.random() * 1000);
   return {
     id: crypto.randomUUID(),
     date,
@@ -105,7 +106,8 @@ function mkTask(date: string, text: string, section: Section, carried = false): 
     text: text.trim(),
     done: false,
     carried,
-    createdAt: Date.now() + Math.floor(Math.random() * 1000),
+    createdAt: now,
+    updatedAt: now,
   };
 }
 
@@ -142,7 +144,7 @@ function createTaskStore(repo: ITaskRepository) {
       const { tasks } = get();
       const task = tasks.find((t) => t.id === id);
       if (!task) return;
-      const updates = { done: !task.done };
+      const updates = { done: !task.done, updatedAt: Date.now() };
       await repo.update(id, updates);
       set({ tasks: tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)) });
     },
@@ -152,14 +154,17 @@ function createTaskStore(repo: ITaskRepository) {
       const { tasks } = get();
       const task = tasks.find((t) => t.id === id);
       if (!value || !task || task.text === value) return;
-      await repo.update(id, { text: value });
-      set({ tasks: tasks.map((t) => (t.id === id ? { ...t, text: value } : t)) });
+      const updates = { text: value, updatedAt: Date.now() };
+      await repo.update(id, updates);
+      set({ tasks: tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)) });
     },
 
     removeTask: async (id) => {
       const { tasks } = get();
       if (!tasks.some((t) => t.id === id)) return;
-      await repo.remove(id);
+      // Soft-delete (tombstone) so the removal propagates to other devices on
+      // sync instead of the row reappearing from a peer that still has it.
+      await repo.update(id, { deleted: true, updatedAt: Date.now() });
       set({ tasks: tasks.filter((t) => t.id !== id) });
     },
 
