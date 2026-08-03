@@ -4,12 +4,14 @@ import {
   isGoogleDriveConfigured,
   isGoogleDriveConnected,
 } from "@/utils/googleDrive";
+import { passphraseProvider, isPassphraseEnabled } from "@/utils/passphrase";
 
 // Chooses whichever sync method the user has enabled and coordinates automatic
-// syncing. Only one auto-sync method is active at a time. (The passphrase
-// provider is added here in a later PR.)
+// syncing. Only one auto-sync method is active at a time; the UI keeps them
+// mutually exclusive (enabling one disables the other).
 
 export function getActiveProvider(): SyncProvider | null {
+  if (isPassphraseEnabled()) return passphraseProvider;
   if (isGoogleDriveConfigured() && isGoogleDriveConnected()) return googleDriveProvider;
   return null;
 }
