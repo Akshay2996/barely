@@ -135,6 +135,10 @@ function StepQuestion({ section }: { section: Section }) {
   const setStep = useAppStore((s) => s.setStep);
   const existing = useExistingCount(section);
   const cap = Math.max(0, MAX - existing);
+  // Navigation skips the other section entirely if it's already full today.
+  const otherFull = useExistingCount(isWork ? "personal" : "work") >= MAX;
+  const backStep = isWork ? 0 : otherFull ? 0 : 1;
+  const nextStep = isWork ? (otherFull ? 3 : 2) : 3;
   const hint =
     cap === 0
       ? "You’ve already got three for today - that’s the cap."
@@ -177,10 +181,10 @@ function StepQuestion({ section }: { section: Section }) {
           marginTop: "var(--space-3)",
         }}
       >
-        <a onClick={() => setStep(isWork ? 0 : 1)} style={{ cursor: "pointer", fontSize: 14 }}>
+        <a onClick={() => setStep(backStep)} style={{ cursor: "pointer", fontSize: 14 }}>
           back
         </a>
-        <button className="btn btn-primary" onClick={() => setStep(isWork ? 2 : 3)}>
+        <button className="btn btn-primary" onClick={() => setStep(nextStep)}>
           Next
           <Icon name="arrowRight" size={17} />
         </button>
@@ -232,7 +236,6 @@ function ReviewList({ section }: { section: Section }) {
 export function Checkin() {
   const step = useAppStore((s) => s.checkin.step);
   const tone = useAppStore((s) => s.settings.tone);
-  const beginCheckin = useAppStore((s) => s.beginCheckin);
   const setStep = useAppStore((s) => s.setStep);
   const go = useAppStore((s) => s.go);
   const draftWork = useAppStore((s) => s.checkin.draftWork);
@@ -241,10 +244,92 @@ export function Checkin() {
 
   const copy = toneCopy(tone);
 
+  // A section that's already at its 3-task cap for today is skipped: we don't
+  // ask its question. If BOTH are full there's nothing to add, so we show the
+  // "day is full" state instead of the check-in.
+  const workFull = useExistingCount("work") >= MAX;
+  const personalFull = useExistingCount("personal") >= MAX;
+  const dayFull = workFull && personalFull;
+  const openCount = (workFull ? 0 : 1) + (personalFull ? 0 : 1);
+  const firstStep = workFull ? 2 : 1; // first section we still ask about
+  const stages = [...(workFull ? [] : [1]), ...(personalFull ? [] : [2]), 3];
+  const position = stages.indexOf(step) + 1;
+
   const finish = async () => {
     await commitCheckin(draftWork, draftPersonal);
     go("today");
   };
+
+  if (dayFull) {
+    return (
+      <section
+        style={{
+          width: "100%",
+          maxWidth: 520,
+          margin: "auto 0",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          gap: "var(--space-3)",
+          paddingBlock: "var(--space-6)",
+          animation: "barely-fade-up .35s ease",
+        }}
+      >
+        <span
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 999,
+            background: "var(--color-accent-100)",
+            color: "var(--color-accent-600)",
+            display: "grid",
+            placeItems: "center",
+          }}
+        >
+          <Icon name="check" size={30} strokeWidth={2.5} />
+        </span>
+        <h2 style={{ margin: 0 }}>Your day is already full.</h2>
+        <p className="text-muted" style={{ margin: 0, maxWidth: "40ch" }}>
+          Three for work and three for you - that's the cap. Barely, remember? There's genuinely
+          nothing more to add today.
+        </p>
+        <div
+          className="card elev-sm"
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "var(--space-3)",
+            textAlign: "left",
+            background: "var(--color-accent-2-100)",
+            width: "100%",
+          }}
+        >
+          <span
+            style={{
+              width: 36,
+              height: 36,
+              flex: "none",
+              borderRadius: 999,
+              background: "var(--color-accent-2-200)",
+              color: "var(--color-accent-2-700)",
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            <Icon name="info" size={18} />
+          </span>
+          <div className="text-muted" style={{ fontSize: 14 }}>
+            Want to swap something in? Head to Today and remove a task first, then add the new one.
+          </div>
+        </div>
+        <button className="btn btn-primary btn-block" onClick={() => go("today")}>
+          Back to today
+          <Icon name="arrowRight" size={17} />
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -257,7 +342,7 @@ export function Checkin() {
         paddingTop: "var(--space-6)",
       }}
     >
-      {step >= 1 && step <= 3 && (
+      {position > 0 && (
         <div
           style={{
             textAlign: "center",
@@ -267,7 +352,7 @@ export function Checkin() {
             color: "var(--color-accent)",
           }}
         >
-          Step {step} of 3
+          Step {position} of {stages.length}
         </div>
       )}
 
@@ -297,12 +382,14 @@ export function Checkin() {
           </span>
           <h2 style={{ margin: 0 }}>{copy.greeting}</h2>
           <p className="text-muted" style={{ margin: 0, maxWidth: "38ch" }}>
-            Two little questions, then you’re free. Type your answers - or tap the mic and just say
-            them.
+            {openCount === 1
+              ? "Just one little question, then you’re free - your other list is already full."
+              : "Two little questions, then you’re free."}{" "}
+            Type your answers - or tap the mic and just say them.
           </p>
           <button
             className="btn btn-primary"
-            onClick={beginCheckin}
+            onClick={() => setStep(firstStep)}
             style={{ marginTop: "var(--space-2)" }}
           >
             Begin
@@ -311,8 +398,8 @@ export function Checkin() {
         </div>
       )}
 
-      {step === 1 && <StepQuestion section="work" />}
-      {step === 2 && <StepQuestion section="personal" />}
+      {step === 1 && !workFull && <StepQuestion section="work" />}
+      {step === 2 && !personalFull && <StepQuestion section="personal" />}
 
       {step === 3 && (
         <div
@@ -347,14 +434,17 @@ export function Checkin() {
             className="card elev-sm"
             style={{ width: "100%", textAlign: "left", gap: "var(--space-3)" }}
           >
-            <ReviewList section="work" />
-            <ReviewList section="personal" />
+            {!workFull && <ReviewList section="work" />}
+            {!personalFull && <ReviewList section="personal" />}
           </div>
           <button className="btn btn-primary btn-block" onClick={finish}>
             See today
             <Icon name="arrowRight" size={17} />
           </button>
-          <a onClick={() => setStep(2)} style={{ cursor: "pointer", fontSize: 14 }}>
+          <a
+            onClick={() => setStep(personalFull ? 1 : 2)}
+            style={{ cursor: "pointer", fontSize: 14 }}
+          >
             go back
           </a>
         </div>
