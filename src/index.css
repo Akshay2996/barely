@@ -606,7 +606,10 @@ input[type="time"] {
     display: grid !important;
   }
   .barely-main {
-    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+    /* Clear both the bottom tab bar and the floating + button (its top edge
+       sits ~150px above the viewport bottom), so the last card's actions -
+       e.g. "Import backup" - never hide behind the FAB. */
+    padding-bottom: calc(164px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 @media (max-width: 540px) {
@@ -620,5 +623,11 @@ input[type="time"] {
   }
   .barely-reminderrow {
     flex-wrap: wrap !important;
+  }
+  /* When the row wraps, don't leave the test-nudge button floating far-right
+     on its own line - make it a clean full-width action. */
+  .barely-testnudge {
+    margin-left: 0 !important;
+    width: 100%;
   }
 }

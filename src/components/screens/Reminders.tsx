@@ -348,7 +348,7 @@ export function Reminders() {
               </label>
               <TimePicker value={settings.reminderTime} onChange={onTimeChange} />
               <button
-                className="btn btn-secondary"
+                className="btn btn-secondary barely-testnudge"
                 onClick={sendTestNudge}
                 style={{ marginLeft: "auto" }}
               >
