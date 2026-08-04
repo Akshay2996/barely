@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && tsc -p tsconfig.api.json && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.api.json",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"*.{js,ts,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"*.{js,ts,json}\""
   },
@@ -21,6 +21,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@types/node": "^22.20.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^6.0.4",
