@@ -14,6 +14,10 @@
 [![Built with React + TypeScript](https://img.shields.io/badge/React%2018-TypeScript-c67139.svg)](#tech-stack)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-7a8a5e.svg)](CONTRIBUTING.md)
 
+<br />
+
+<img src="barely.png" alt="Barely - the least you can do" width="420" />
+
 </div>
 
 ---
