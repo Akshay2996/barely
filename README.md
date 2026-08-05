@@ -39,6 +39,68 @@ It runs entirely in the browser, works offline, and installs to your phone's hom
 - **Carry-over** - optionally bring one unfinished thing to tomorrow. Off by default; no task should follow you around.
 - **Installable PWA** - add to your home screen on **iOS and Android**; fully responsive from phone to desktop, with safe-area support for notches and home indicators.
 - **Offline-first & private** - all data lives on your device in IndexedDB. If storage is ever unavailable, the app degrades gracefully to an in-memory session instead of breaking.
+- **Optional cross-device sync** - three ways to keep your phone and laptop in step (a manual backup file, your own Google Drive, or an end-to-end-encrypted passphrase). Pick one, or none - [see below](#sync-across-your-devices).
+
+## Sync across your devices
+
+Barely is **offline-first** - it needs no account and no server, and your data lives on your device. When you _do_ want your phone and laptop to share the same three-things history, you pick **one** of three methods. Each is fully optional, and **none of them send readable data to us.**
+
+| Method | How it works | Where your data lives | You need |
+| --- | --- | --- | --- |
+| **① Manual backup** | Export a JSON file, import it on the other device | A file you keep | Nothing |
+| **② Google Drive** | Sign in with Google; syncs automatically in the background | A hidden folder in **your own** Google Drive (`appDataFolder`) | A Google account |
+| **③ Passphrase** | Enter the same secret code on both devices; syncs automatically, **end-to-end encrypted** | A tiny serverless key-value store - only ciphertext | Just a passphrase |
+
+**Your privacy holds either way.** The Google Drive file lives in _your_ Drive (the app can't see the rest of it). For passphrase sync, the snapshot is encrypted **in your browser** - AES-GCM with a key derived from your passphrase via PBKDF2 - so the backend (a Vercel Edge Function backed by Upstash Redis) only ever stores an **opaque id and ciphertext**. Lose every device _and_ forget the passphrase and that data can't be recovered - which is the point (keep a manual backup as a fallback).
+
+### How a sync merges
+
+Every sync is a **pull → merge → push** pass that converges no matter which device wrote last:
+
+- Tasks merge **by id** - the newest `updatedAt` wins.
+- Deletions travel as **soft-delete tombstones**, so a task you removed on one device doesn't resurrect from another.
+- Each device keeps its own **settings and reminder** - a sync never clobbers your local preferences.
+
+## Architecture
+
+Everything runs in the browser. The UI talks to state, state talks to a storage layer that prefers IndexedDB (and silently falls back to memory), and an optional, provider-agnostic **sync engine** fans out to whichever method you chose.
+
+```mermaid
+flowchart TD
+    subgraph device["📱 Your device (browser or installed PWA)"]
+        direction TB
+        UI["🖥️ React + TypeScript UI<br/>Onboarding · Check-in · Today · Progress · Reminders"]
+        store["🗂️ Zustand stores<br/>appStore · taskStore"]
+        repo["🔌 Repository layer<br/>task / reminder interfaces"]
+        idb[("💾 IndexedDB")]
+        mem[("🧠 In-memory fallback")]
+        sw["⚙️ Service Worker<br/>offline cache · daily nudge"]
+        engine["🔄 Sync engine<br/>pull → merge → push<br/>newest-wins · tombstones"]
+        UI --> store --> repo --> idb
+        repo -. "storage blocked" .-> mem
+        store --> engine --> repo
+        sw -. "notification" .-> UI
+    end
+
+    engine -->|"① Manual"| file["⬇️ JSON backup file"]
+    engine -->|"② Google Drive"| gdrive["☁️ Google Drive<br/>appDataFolder in your Drive"]
+    engine -->|"③ Passphrase"| edge["🔒 /api/sync · Vercel Edge"]
+    edge --> redis[("🗝️ Upstash Redis<br/>opaque id + ciphertext")]
+
+    classDef ui fill:#c67139,stroke:#8f4e22,color:#ffffff;
+    classDef state fill:#e9dcc4,stroke:#b9a888,color:#4a3f2f;
+    classDef data fill:#7a8a5e,stroke:#586845,color:#ffffff;
+    classDef sync fill:#d98b4e,stroke:#a6602c,color:#ffffff;
+    classDef cloud fill:#5b7d9a,stroke:#3f5a70,color:#ffffff;
+
+    class UI ui;
+    class store,repo,sw state;
+    class idb,mem data;
+    class engine sync;
+    class file,gdrive,edge,redis cloud;
+```
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full technical walkthrough.
 
 ## Tech stack
 
@@ -51,8 +113,7 @@ It runs entirely in the browser, works offline, and installs to your phone's hom
 | PWA | [`vite-plugin-pwa`](https://vite-pwa-org.netlify.app/) (Workbox service worker) |
 | Styling | Hand-rolled CSS design system (design tokens in `src/index.css`) |
 | Platform APIs | Web Speech, Notifications + Service Worker, Web App Manifest |
-
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full technical walkthrough.
+| Sync (optional) | [Web Crypto](https://developer.mozilla.org/docs/Web/API/Web_Crypto_API) (AES-GCM + PBKDF2), Google Drive `appdata`, [Vercel Edge Functions](https://vercel.com/docs/functions) + [Upstash Redis](https://upstash.com/) |
 
 ## Getting started
 
@@ -105,9 +166,14 @@ src/
 ├─ hooks/             # useNotifications, useVoiceCapture, useMonthHistory, useInstallPrompt
 ├─ stores/            # Zustand stores (appStore, taskStore)
 ├─ repositories/      # Storage layer (IndexedDB + in-memory fallback)
-├─ utils/             # date, tone, notify helpers, history (opt-in demo data)
+├─ utils/             # date, tone, notify, backup + sync engine
+│                     #   sync.ts / syncManager.ts (provider-agnostic engine)
+│                     #   googleDrive.ts · passphrase.ts · crypto.ts (AES-GCM/PBKDF2)
 ├─ types/             # Shared TypeScript types
 └─ index.css          # Design tokens + component styles
+
+api/
+└─ sync.ts            # Vercel Edge Function for passphrase sync (Upstash-backed)
 ```
 
 ## Contributing
