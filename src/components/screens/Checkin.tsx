@@ -137,8 +137,10 @@ function StepQuestion({ section }: { section: Section }) {
   const cap = Math.max(0, MAX - existing);
   // Navigation skips the other section entirely if it's already full today.
   const otherFull = useExistingCount(isWork ? "personal" : "work") >= MAX;
-  const backStep = isWork ? 0 : otherFull ? 0 : 1;
-  const nextStep = isWork ? (otherFull ? 3 : 2) : 3;
+  // Personal is asked first (step 1), then work (step 2).
+  const isFirst = !isWork;
+  const backStep = isFirst ? 0 : otherFull ? 0 : 1;
+  const nextStep = isFirst ? (otherFull ? 3 : 2) : 3;
   const hint =
     cap === 0
       ? "You’ve already got three for today - that’s the cap."
@@ -251,8 +253,8 @@ export function Checkin() {
   const personalFull = useExistingCount("personal") >= MAX;
   const dayFull = workFull && personalFull;
   const openCount = (workFull ? 0 : 1) + (personalFull ? 0 : 1);
-  const firstStep = workFull ? 2 : 1; // first section we still ask about
-  const stages = [...(workFull ? [] : [1]), ...(personalFull ? [] : [2]), 3];
+  const firstStep = personalFull ? 2 : 1; // first section we still ask about
+  const stages = [...(personalFull ? [] : [1]), ...(workFull ? [] : [2]), 3];
   const position = stages.indexOf(step) + 1;
 
   const finish = async () => {
@@ -398,8 +400,8 @@ export function Checkin() {
         </div>
       )}
 
-      {step === 1 && !workFull && <StepQuestion section="work" />}
-      {step === 2 && !personalFull && <StepQuestion section="personal" />}
+      {step === 1 && !personalFull && <StepQuestion section="personal" />}
+      {step === 2 && !workFull && <StepQuestion section="work" />}
 
       {step === 3 && (
         <div
@@ -434,15 +436,15 @@ export function Checkin() {
             className="card elev-sm"
             style={{ width: "100%", textAlign: "left", gap: "var(--space-3)" }}
           >
-            {!workFull && <ReviewList section="work" />}
             {!personalFull && <ReviewList section="personal" />}
+            {!workFull && <ReviewList section="work" />}
           </div>
           <button className="btn btn-primary btn-block" onClick={finish}>
             See today
             <Icon name="arrowRight" size={17} />
           </button>
           <a
-            onClick={() => setStep(personalFull ? 1 : 2)}
+            onClick={() => setStep(workFull ? 1 : 2)}
             style={{ cursor: "pointer", fontSize: 14 }}
           >
             go back
